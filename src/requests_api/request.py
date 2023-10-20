@@ -7,7 +7,8 @@ from loguru import logger
 def get_request(url, params):
     try:
         response = requests.get(
-            url=url, headers=RAPID_HEADERS, params=params, timeout=10)
+            url=url, headers=RAPID_HEADERS, params=params, timeout=10
+        )
         if response.status_code == requests.codes.ok:
             return response.json()
         return None
@@ -15,14 +16,15 @@ def get_request(url, params):
         logger.error(ex)
         return None
     finally:
-        logger.info(f'{response = }')
+        logger.info(f"{response.status_code = }")
 
 
 @logger.catch
 def post_request(url, params):
     try:
         response = requests.post(
-            url=url, headers=RAPID_HEADERS, json=params, timeout=10)
+            url=url, headers=RAPID_HEADERS, json=params, timeout=10
+        )
         if response.status_code == requests.codes.ok:
             return response.json()
         return None
@@ -30,14 +32,14 @@ def post_request(url, params):
         logger.error(ex)
         return None
     finally:
-        logger.info(f'{response = }')
+        logger.info(f"{response.status_code = }")
 
 
 @logger.catch
 def api_request(url_endswith: str, params: dict, method: str) -> dict:
     url = URL_RAPIDAPI + url_endswith
 
-    if method == 'GET':
+    if method == "GET":
         return get_request(url, params)
     else:
         return post_request(url, params)
@@ -45,16 +47,16 @@ def api_request(url_endswith: str, params: dict, method: str) -> dict:
 
 if __name__ == "__main__":
     searches = api_request(
-        url_endswith='locations/v3/search',
+        url_endswith="locations/v3/search",
         params={"q": "париж", "locale": "ru_RU"},
-        method='GET'
+        method="GET",
     )
 
     cities = dict()
-    if searches and searches.get('sr'):
-        for search in searches.get('sr'):
-            if search.get('type') == "CITY":
-                city_id = search.get('gaiaId')
-                region = search.get('regionNames').get('fullName')
+    if searches and searches.get("sr"):
+        for search in searches.get("sr"):
+            if search.get("type") == "CITY":
+                city_id = search.get("gaiaId")
+                region = search.get("regionNames").get("fullName")
                 cities[region] = city_id
-    logger.info(f'{cities = }')
+    logger.info(f"{cities = }")
