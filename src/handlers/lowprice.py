@@ -2,7 +2,7 @@ from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from keyboards.client_kb import get_kb, get_ikb
 from requests_api.get_cities import parse_cities
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from config_data.config import START_KB, NUM_HOTELS_KB, YESNO_KB, NUM_PHOTOS_KB
 from loguru import logger
@@ -11,96 +11,6 @@ from telegram_bot_calendar import DetailedTelegramCalendar
 from datetime import date, timedelta
 
 from handlers.print_result import get_hotels
-
-# TODO delete HOTELS and get_hotels()
-HOTELS = [
-    {
-        "hotel_id": "478852",
-        "hotel_name": "Viktorija Hotel",
-        "price": 29,
-        "checkInDate": "10-10-2023",
-        "checkOutDate": "12-10-2023",
-        "timedelta": 2,
-        "address": "ул. A. Caka, 55, Рига, LV-1011",
-        "destinationInfo": 1.77,
-        "photos": [
-            "https://images.trvl-media.com/lodging/1000000/480000/478900/478852/97f4d32c.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/1000000/480000/478900/478852/8c57d145.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/1000000/480000/478900/478852/3b860c8b.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/1000000/480000/478900/478852/c3a1a2bc.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/1000000/480000/478900/478852/7a6a1789.jpg?impolicy=resizecrop&rw=500&ra=fit",
-        ],
-    },
-    {
-        "hotel_id": "1943009",
-        "hotel_name": "Dodo Hotel",
-        "price": 35,
-        "checkInDate": "10-10-2023",
-        "checkOutDate": "12-10-2023",
-        "timedelta": 2,
-        "address": "ул. Jersikas, 1, Рига, 1003",
-        "destinationInfo": 2.47,
-        "photos": [
-            "https://images.trvl-media.com/lodging/2000000/1950000/1943100/1943009/4f906a5e.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/2000000/1950000/1943100/1943009/bd22f8b0.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/2000000/1950000/1943100/1943009/57e23e9c.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/2000000/1950000/1943100/1943009/ba6b5c8b.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/2000000/1950000/1943100/1943009/35e648e6.jpg?impolicy=resizecrop&rw=500&ra=fit",
-        ],
-    },
-    {
-        "hotel_id": "10039243",
-        "hotel_name": "Mosaic Hotel",
-        "price": 36,
-        "checkInDate": "10-10-2023",
-        "checkOutDate": "12-10-2023",
-        "timedelta": 2,
-        "address": "ул. Elizabetes, 31а, стр. 601, во дворе дома 31а, Рига, LV-1010",
-        "destinationInfo": 0.98,
-        "photos": [
-            "https://images.trvl-media.com/lodging/11000000/10040000/10039300/10039243/a4d9613b.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/11000000/10040000/10039300/10039243/9eb946d4.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/11000000/10040000/10039300/10039243/b2767870.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/11000000/10040000/10039300/10039243/6b52cce0.jpg?impolicy=resizecrop&rw=500&ra=fit",
-            "https://images.trvl-media.com/lodging/11000000/10040000/10039300/10039243/91e07444.jpg?impolicy=resizecrop&rw=500&ra=fit",
-        ],
-    },
-]
-
-
-# @logger.catch
-# async def get_hotels(msg: Message) -> Message | None:
-#    for hotel in HOTELS:
-#        price = hotel.get("price")
-#        days = hotel.get("timedelta")
-
-#        try:
-#            fullprice = "{:.2f}".format(float(price) * int(days))
-#        except Exception as ex:
-#            logger.error(f"{ex} \n{price = } \n{days = }")
-#            fullprice = None
-
-#        about_hotel = "\n".join(
-#            [
-#                f'Отель: {hotel.get("hotel_name")}',
-#                f'Адрес: {hotel.get("address")}',
-#                f'Удаленность от центра: {hotel.get("destinationInfo")} км.',
-#                f'Дата заезда: {hotel.get("checkInDate")}',
-#                f'Дата выезда: {hotel.get("checkOutDate")}',
-#                f"Цена за ночь: ${price}",
-#                f"Полная стоимость: ${fullprice}",
-#            ]
-#        )
-#        await msg.answer(text=about_hotel)
-
-#        images = hotel.get("photos")
-#        if images:
-#            photos_media_list = [InputMediaPhoto(media=photo) for photo in images]
-#            logger.info(f"{photos_media_list = }")
-
-#            await bot.send_media_group(chat_id=msg.chat.id, media=photos_media_list)
-#        else:
-#            await msg.answer(text="NO PHOTOS")
 
 
 class ProfileStatesGroup(StatesGroup):
