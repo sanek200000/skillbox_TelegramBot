@@ -1,16 +1,27 @@
-from peewee import *
+from peewee import (
+    SqliteDatabase,
+    Model,
+    PrimaryKeyField,
+    CharField,
+    DateField,
+    ForeignKeyField,
+    FloatField,
+    IntegerField,
+)
 
 # Set DB
-db = SqliteDatabase('db.sqlite3')
+db = SqliteDatabase("db.sqlite3")
+
 
 class BaseModel(Model):
-    """ Базовый класс для создания таблиц в БД. """
-    
+    """Базовый класс для создания таблиц в БД."""
+
     id = PrimaryKeyField(unique=True)
-    
+
     class Meta:
         database = db
-        order_by = 'id'
+        order_by = "id"
+
 
 class User(BaseModel):
     """
@@ -20,10 +31,12 @@ class User(BaseModel):
         id (int): Уникальный id пользователя.
         name (str): Уникальное имя пользователя (сюда запишется username пользователя Telegram).
     """
+
     name = CharField()
-    
+
     class Meta:
-        db_table = 'users'
+        db_table = "users"
+
 
 class History(BaseModel):
     """
@@ -37,17 +50,18 @@ class History(BaseModel):
         end_date (datetime.date): Дата выселения из отеля.
         from_user (str): name - Уникальное имя пользователя из таблицы 'users' для связки таблиц.
     """
-    
+
     date = DateField()
     command = CharField()
     city = CharField()
     start_date = DateField()
     end_date = DateField()
     from_user = ForeignKeyField(User.name)
-    
+
     class Meta:
-        db_table = 'hystories'
-        order_by = 'date'
+        db_table = "hystories"
+        order_by = "date"
+
 
 class SearchResult(BaseModel):
     """
@@ -63,7 +77,7 @@ class SearchResult(BaseModel):
         amount_nights (int): Количество ночей.
         from_date (datetime.date): date - Уникальная дата запроса из таблицы 'histories' для связки таблиц.
     """
-    
+
     hotel_name = CharField()
     price_per_night = FloatField()
     total_price = FloatField()
@@ -72,9 +86,14 @@ class SearchResult(BaseModel):
     hotel_area = CharField()
     amount_nights = IntegerField()
     form_date = ForeignKeyField(History.date)
-    
+
     class Meta:
-        db_table = 'results'
-        order_by = 'price_per_night'
-    
-        
+        db_table = "results"
+        order_by = "price_per_night"
+
+
+if __name__ == "__main__":
+    with db:
+        db.create_tables([User, History, SearchResult])
+
+    print("DONE")
