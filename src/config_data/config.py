@@ -25,6 +25,11 @@ RAPID_HEADERS = {
     "X-RapidAPI-Key": RAPID_API_KEY,
     "X-RapidAPI-Host": "hotels4.p.rapidapi.com",
 }
+SEARCH_SORTING = {
+    "/lowprice": "PRICE_LOW_TO_HIGH",
+    "/highprice": "PRICE_HIGHEST_FIRST",
+    "/bestdeal": "DISTANCE",
+}
 
 if __name__ == "__main__":
     print(f"{BOT_TOKEN = }")
@@ -35,3 +40,4 @@ if __name__ == "__main__":
     print(f"{YESNO_KB = }")
     print(f"{URL_RAPIDAPI = }")
     print(f"{RAPID_HEADERS = }")
+    print(f"{SEARCH_SORTING = }")
