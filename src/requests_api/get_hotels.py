@@ -92,7 +92,7 @@ def parse_hotels(**kwargs) -> list | None:
         "rooms": [{"adults": 1, "children": []}],
         "resultsSize": resultsSize,
         "sort": sort,
-        "filters": {},
+        "filters": {"availableFilter": "SHOW_AVAILABLE_ONLY"},
     }
     logger.info(f"parse_hotels {params = }")
 
@@ -173,8 +173,3 @@ if __name__ == "__main__":
 
     hotels = parse_hotels(**data)
     logger.info(hotels)
-
-    # data = {'hotel_id': '91003653',
-    #        'img_count': 3}
-    # hotel = get_detail(**data)
-    # logger.info(f'{hotel = }')
