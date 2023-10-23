@@ -4,7 +4,13 @@ from keyboards.client_kb import get_kb, get_ikb
 from requests_api.get_cities import parse_cities
 from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from config_data.config import START_KB, NUM_HOTELS_KB, YESNO_KB, NUM_PHOTOS_KB
+from config_data.config import (
+    START_KB,
+    NUM_HOTELS_KB,
+    YESNO_KB,
+    NUM_PHOTOS_KB,
+    SEARCH_SORTING,
+)
 from loguru import logger
 from requests_api.get_hotels import parse_hotels
 from telegram_bot_calendar import DetailedTelegramCalendar
@@ -38,19 +44,23 @@ async def cancel_states(msg: Message, state: FSMContext) -> Message | None:
 
 
 @logger.catch
-async def get_city(msg: Message) -> Message | None:
+async def get_city(msg: Message, state: FSMContext) -> Message | None:
     """
     Функция просит ввести город.
     Входит в машину состояний ProfileStatesGroup,
     возвращает название города: Message
     """
 
+    print(f"{msg.text = }")
+    async with state.proxy() as data:
+        data["sort"] = SEARCH_SORTING.get(msg.text)
+
     await msg.reply("Введите название города.", reply_markup=get_kb(["/cancel"]))
     await ProfileStatesGroup.get_city.set()
 
 
 @logger.catch
-async def get_location(msg: Message, state: FSMContext) -> CallbackQuery | None:
+async def get_location(msg: Message) -> CallbackQuery | None:
     """
     Функция получает город из get_city,
     ищет совпадения на rapidapi.com,
@@ -165,8 +175,10 @@ async def amount_photos(clb: CallbackQuery, state: FSMContext):
 async def finish_fsm(clb: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data["img_count"] = int(clb.data)
-        data["sort"] = "PRICE_LOW_TO_HIGH"
+        # data["sort"] = "PRICE_LOW_TO_HIGH"
         logger.info(data._data)
+
+    await clb.message.edit_text(text="Пожалуйста, подождите, идет подбор отелей.")
 
     hotels = parse_hotels(**data._data)
     await get_hotels(chat_id=clb.message.chat.id, hotels=hotels)
@@ -177,10 +189,15 @@ async def finish_fsm(clb: CallbackQuery, state: FSMContext):
 @logger.catch
 def register_handlers_client(dp: Dispatcher) -> None:
     dp.register_message_handler(cancel_states, commands="cancel", state="*")
-    dp.register_message_handler(get_city, commands="lowprice")
-    dp.register_message_handler(get_hotels, commands="test_hotels")  # TODO delete
+    dp.register_message_handler(
+        get_city,
+        commands=(
+            "lowprice",
+            "highprice",
+            "bestdeal",
+        ),
+    )
     dp.register_message_handler(get_location, state=ProfileStatesGroup.get_city)
-
     dp.register_callback_query_handler(
         amount_hotels, state=ProfileStatesGroup.amount_hotels
     )
