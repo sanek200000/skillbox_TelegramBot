@@ -1,6 +1,6 @@
 from aiogram import executor
 from create_bot import dp
-from handlers import lowprice, start
+from handlers import search, start
 from loguru import logger
 
 
@@ -20,6 +20,6 @@ async def on_startup(_):
 
 
 start.register_handlers_client(dp)
-lowprice.register_handlers_client(dp)
+search.register_handlers_client(dp)
 
 executor.start_polling(dp, skip_updates=True, on_startup=on_startup)

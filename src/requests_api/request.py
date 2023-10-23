@@ -4,7 +4,7 @@ from loguru import logger
 
 
 @logger.catch
-def get_request(url, params):
+def get_request(url: str, params: dict):
     try:
         response = requests.get(
             url=url, headers=RAPID_HEADERS, params=params, timeout=10
@@ -20,7 +20,7 @@ def get_request(url, params):
 
 
 @logger.catch
-def post_request(url, params):
+def post_request(url: str, params: dict):
     try:
         response = requests.post(
             url=url, headers=RAPID_HEADERS, json=params, timeout=10

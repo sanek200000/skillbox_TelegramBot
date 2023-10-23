@@ -13,7 +13,13 @@ RAPID_API_KEY = os.getenv("RAPID_API_KEY")
 
 
 # Keyboards
-START_KB = ("/lowprice", "/highprice", "/bestdeal", "/history", "/kill")
+START_KB = (
+    "/lowprice",
+    "/highprice",
+    "/bestdeal",
+    "/history",
+    "/kill",
+)  # TODO Убрать команду "/kill"
 NUM_HOTELS_KB = {str(i): i for i in range(1, 11)}
 NUM_PHOTOS_KB = {str(i): i for i in range(1, 6)}
 YESNO_KB = {"Да": "1", "Нет": "0"}
