@@ -32,7 +32,7 @@ class User(BaseModel):
         name (str): Уникальное имя пользователя (сюда запишется username пользователя Telegram).
     """
 
-    name = CharField()
+    name = CharField(unique=True)
 
     class Meta:
         db_table = "users"
@@ -82,7 +82,6 @@ class SearchResult(BaseModel):
     price_per_night = FloatField()
     total_price = FloatField()
     distance_city_centre = FloatField()
-    hotel_url = CharField()
     hotel_area = CharField()
     amount_nights = IntegerField()
     form_date = ForeignKeyField(History.date)

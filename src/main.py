@@ -2,6 +2,7 @@ from aiogram import executor
 from create_bot import dp
 from handlers import search, start
 from loguru import logger
+from db.models import *
 
 
 logger.add(
@@ -13,6 +14,12 @@ logger.add(
     diagnose=False,
     enqueue=True,
 )
+
+
+# Create database
+with db:
+    db.create_tables([User, History, SearchResult])
+    logger.info("DB created")
 
 
 async def on_startup(_):

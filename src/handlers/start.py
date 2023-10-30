@@ -2,12 +2,17 @@ from aiogram import types, Dispatcher
 from create_bot import bot
 from keyboards.client_kb import get_kb
 from config_data.config import START_KB
+from loguru import logger
 
 
+@logger.catch
 async def command_start(msg: types.Message):
     try:
         await msg.answer(text="Приветствую!", reply_markup=get_kb(START_KB, 2))
         await msg.delete()
+        # with db:
+        #    USERNAME = User(name=msg.chat.username).save()
+        #    logger.info(f"\n{msg.chat.username = } \n{USERNAME = }")
     except:
         msg.reply(
             "Общение с ботом через ЛС, напишите ему:",

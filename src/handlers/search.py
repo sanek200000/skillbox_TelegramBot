@@ -1,3 +1,4 @@
+from loguru import logger
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from keyboards.client_kb import get_kb, get_ikb
@@ -11,12 +12,10 @@ from config_data.config import (
     NUM_PHOTOS_KB,
     SEARCH_SORTING,
 )
-from loguru import logger
-from requests_api.get_hotels import parse_hotels
 from telegram_bot_calendar import DetailedTelegramCalendar
 from datetime import date, timedelta
 
-from handlers.print_result import get_hotels
+from handlers.print_result import print_hotels
 
 
 class ProfileStatesGroup(StatesGroup):
@@ -51,16 +50,23 @@ async def get_city(msg: Message, state: FSMContext) -> Message | None:
     возвращает название города: Message
     """
 
-    print(f"{msg.text = }")
+    print(f"{msg = }")
+    # with db:
+    #    USERNAME = User(name=msg.chat.username).save()
+    #    logger.info(f"\n{msg.chat.username = } \n{USERNAME = }")
+
     async with state.proxy() as data:
+        data["command"] = msg.text
         data["sort"] = SEARCH_SORTING.get(msg.text)
+        data["date"] = msg.date.strftime("%Y-%m-%d %H:%M:%S")
+        data["from_user"] = msg.chat.username
 
     await msg.reply("Введите название города.", reply_markup=get_kb(["/cancel"]))
     await ProfileStatesGroup.get_city.set()
 
 
 @logger.catch
-async def get_location(msg: Message) -> CallbackQuery | None:
+async def get_location(msg: Message, state: FSMContext) -> CallbackQuery | None:
     """
     Функция получает город из get_city,
     ищет совпадения на rapidapi.com,
@@ -74,8 +80,12 @@ async def get_location(msg: Message) -> CallbackQuery | None:
 
     cities = parse_cities(city=city)
     if cities:
+        async with state.proxy() as data:
+            data["cities"] = cities
+
         cities["Отмена"] = "cancel"  # TODO дописать cancel
         await msg.answer(text="Выберите локацию.", reply_markup=get_ikb(cities, 1))
+        print(f"{msg = }")
         await ProfileStatesGroup.next()
     else:
         await msg.answer(
@@ -93,7 +103,9 @@ async def amount_hotels(clb: CallbackQuery, state: FSMContext) -> CallbackQuery 
     """
     async with state.proxy() as data:
         data["city_id"] = clb.data
-        logger.info(f'{data["city_id"] = }')
+        data["city"] = data.get("cities").get(clb.data)
+        logger.info(f"{clb.data = }")
+        logger.info(f"{data.get('cities') = }")
 
     await clb.message.edit_text(
         text="Выберите количество отелей в выборке.",
@@ -175,13 +187,12 @@ async def amount_photos(clb: CallbackQuery, state: FSMContext):
 async def finish_fsm(clb: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data["img_count"] = int(clb.data)
-        # data["sort"] = "PRICE_LOW_TO_HIGH"
-        logger.info(data._data)
+        data["chat_id"] = clb.message.chat.id
 
     await clb.message.edit_text(text="Пожалуйста, подождите, идет подбор отелей.")
 
-    hotels = parse_hotels(**data._data)
-    await get_hotels(chat_id=clb.message.chat.id, hotels=hotels)
+    # hotels = parse_hotels(**search_result)
+    await print_hotels(search_result=data._data)
 
     await state.finish()
 

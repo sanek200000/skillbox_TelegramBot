@@ -15,6 +15,6 @@ def get_ikb(buttons: dict, rows=2) -> InlineKeyboardMarkup:
     ikb = InlineKeyboardMarkup(row_width=rows)
 
     for key, val in buttons.items():
-        ikb.insert(InlineKeyboardButton(text=key, callback_data=val))
+        ikb.insert(InlineKeyboardButton(text=val, callback_data=key))
 
     return ikb

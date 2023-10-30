@@ -22,7 +22,7 @@ START_KB = (
 )  # TODO Убрать команду "/kill"
 NUM_HOTELS_KB = {str(i): i for i in range(1, 11)}
 NUM_PHOTOS_KB = {str(i): i for i in range(1, 6)}
-YESNO_KB = {"Да": "1", "Нет": "0"}
+YESNO_KB = {"1": "Да", "0": "Нет"}
 
 # Other
 URL_RAPIDAPI = "https://hotels4.p.rapidapi.com/"
