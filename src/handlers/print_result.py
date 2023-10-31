@@ -1,26 +1,42 @@
-from db.models import *
-from db.save_search import save_search_result
 from loguru import logger
 from create_bot import bot
+from keyboards.client_kb import get_kb
+from config_data.config import START_KB
+from db.save_search import save_search_result
 from aiogram.types import Message, InputMediaPhoto
 from requests_api.get_hotels import parse_hotels
+
+
+@logger.catch
+async def print_hystory(records: dict, chat_id: int) -> Message | None:
+    for record in records:
+        amount_nights = record.amount_nights
+        price_per_night = record.price_per_night
+        fullprice = amount_nights * price_per_night
+
+        about_hotel = "\n".join(
+            [
+                f"Отель: {record.hotel_name}",
+                f"Адрес: {record.hotel_area}",
+                f"Удаленность от центра: {record.distance_city_centre} км.",
+                f"Количество ночей: {amount_nights}",
+                f"Цена за ночь: ${price_per_night}",
+                f"Полная стоимость: ${fullprice}",
+            ]
+        )
+
+        await bot.send_message(chat_id=chat_id, text=about_hotel)
+
+    msg = await bot.send_message(
+        chat_id=chat_id, text="ass", reply_markup=get_kb(START_KB, 2)
+    )
+    await bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
 
 
 @logger.catch
 async def print_hotels(search_result) -> Message | None:
     print(f"{search_result = }")  # TODO delete this
     chat_id = search_result.get("chat_id")
-
-    # with db:
-    #    username = User(name=search_result.get("from_user")).save()
-    #    history = History.create(
-    #        date=search_result.get("date"),
-    #        command=search_result.get("command"),
-    #        city=search_result.get("city"),
-    #        start_date=search_result.get("checkInDate"),
-    #        end_date=search_result.get("checkOutDate"),
-    #        from_user=username,
-    #    )
 
     hotels_to_db_list = list()
     hotels = parse_hotels(**search_result)
@@ -36,8 +52,8 @@ async def print_hotels(search_result) -> Message | None:
         try:
             fullprice = "{:.2f}".format(float(price) * int(days))
         except Exception as ex:
-            logger.error(f"{ex} \n{price = } \n{days = }")
             fullprice = None
+            logger.error(f"{ex} \n{price = } \n{days = }")
 
         about_hotel = "\n".join(
             [

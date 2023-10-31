@@ -50,11 +50,6 @@ async def get_city(msg: Message, state: FSMContext) -> Message | None:
     возвращает название города: Message
     """
 
-    print(f"{msg = }")
-    # with db:
-    #    USERNAME = User(name=msg.chat.username).save()
-    #    logger.info(f"\n{msg.chat.username = } \n{USERNAME = }")
-
     async with state.proxy() as data:
         data["command"] = msg.text
         data["sort"] = SEARCH_SORTING.get(msg.text)
@@ -85,7 +80,6 @@ async def get_location(msg: Message, state: FSMContext) -> CallbackQuery | None:
 
         cities["Отмена"] = "cancel"  # TODO дописать cancel
         await msg.answer(text="Выберите локацию.", reply_markup=get_ikb(cities, 1))
-        print(f"{msg = }")
         await ProfileStatesGroup.next()
     else:
         await msg.answer(
@@ -209,6 +203,7 @@ def register_handlers_client(dp: Dispatcher) -> None:
         ),
     )
     dp.register_message_handler(get_location, state=ProfileStatesGroup.get_city)
+
     dp.register_callback_query_handler(
         amount_hotels, state=ProfileStatesGroup.amount_hotels
     )

@@ -54,5 +54,5 @@ def register_handlers_client(dp: Dispatcher):
     # dp.register_message_handler(command_lowprice, commands=['lowprice'])
     # dp.register_message_handler(command_highprice, commands=["highprice"])
     # dp.register_message_handler(command_bestdeal, commands=["bestdeal"])
-    dp.register_message_handler(command_history, commands=["history"])
+    # dp.register_message_handler(command_history, commands=["history"])
     dp.register_message_handler(kill_cmd, commands="kill")
